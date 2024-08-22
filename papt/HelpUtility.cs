@@ -58,11 +58,13 @@ Examples:
   papt remove vim -pacman
 
 Note:
-  This script is a PowerShell wrapper for the yay AUR helper, designed to mimic APT and Pacman commands.
+  This script is a wrapper for the yay AUR helper, designed to mimic APT and Pacman commands.
   If yay is not installed, pacman will be used automatically with a warning message.
 
 For more information, visit:
   https://github.com/Jguer/yay
+  https://wiki.archlinux.org/title/Pacman
+  https://github.com/AndreaFrederica/papt
 ");
 		}
 	}
