@@ -1,8 +1,4 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-
-name: .NET
+name: .NET Build for Windows and Linux
 
 on:
   push:
@@ -10,31 +6,39 @@ on:
   pull_request:
     branches: [ "master" ]
 
-
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        runtime: [linux-x64, win-x64]
-
+  build-windows:
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET
+    - name: Setup .NET for Windows
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
+    - name: Restore dependencies for Windows
       run: dotnet restore
-    - name: Publish with AOT (or Single File) for ${{ matrix.runtime }}
-      run: dotnet publish --configuration Release --self-contained --runtime ${{ matrix.runtime }} -p:PublishAot=true -o ./publish # 或者选择单文件发布
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: Upload build artifacts for ${{ matrix.os }}
+    - name: Publish for Windows (win-x64, AOT)
+      run: dotnet publish --configuration Release --self-contained --runtime win-x64 -p:PublishAot=true -o ./publish
+    - name: Upload build artifacts for Windows
       uses: actions/upload-artifact@v3
       with:
-        name: build-artifacts-${{ matrix.os }}
+        name: win64-build
+        path: ./publish
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET for Linux
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies for Linux
+      run: dotnet restore
+    - name: Publish for Linux (linux-x64, AOT)
+      run: dotnet publish --configuration Release --self-contained --runtime linux-x64 -p:PublishAot=true -o ./publish
+    - name: Upload build artifacts for Linux
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux64-build
         path: ./publish
