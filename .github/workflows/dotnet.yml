@@ -14,6 +14,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        runtime: [linux-x64, win-x64]
+
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -22,7 +27,12 @@ jobs:
         dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Publish with AOT and Single File for ${{ matrix.runtime }}
+      run: dotnet publish --configuration Release --self-contained --runtime ${{ matrix.runtime }} -p:PublishAot=true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -o ./publish
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Upload build artifacts for ${{ matrix.os }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts-${{ matrix.os }}
+        path: ./publish
