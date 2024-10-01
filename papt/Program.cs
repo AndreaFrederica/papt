@@ -12,7 +12,7 @@ internal class PackageManagerScript
 {
 	const int PROG_EXIT_SUCCESS = 0;
 	const int PROG_EXIT_ERROR = 1;
-	private static string shell = "/bin/bash";
+	private static string? shell = null;
 
 	//! 增加对多种AurHelper的支持
 	private static Dictionary<string, int> aur_helpers_priority = new()
@@ -49,8 +49,9 @@ internal class PackageManagerScript
 		{
 			if (commandArgs[i] == "-helper")
 			{
-				string helper = commandArgs[i+1];
-				if(!aur_helpers.Contains(helper)){
+				string helper = commandArgs[i + 1];
+				if (!aur_helpers.Contains(helper))
+				{
 					aur_helpers.Add(helper);
 				}
 				aur_helpers_priority[helper] = 0;
@@ -71,11 +72,12 @@ internal class PackageManagerScript
 			.Where(helper => aur_helpers_result[helper]) // 只保留存在的助手
 			.OrderByDescending(helper => aur_helpers_priority[helper])
 			.ToList();
-		
+
 		string packageManager = "pacman";
-		if (sortedHelpers.Count > 0){
-		packageManager = sortedHelpers[0];
-		Logger.Warning("Can't find any aur_helper in system");
+		if (sortedHelpers.Count > 0)
+		{
+			packageManager = sortedHelpers[0];
+			Logger.Warning("Can't find any aur_helper in system");
 		}
 		// 如果未提供 Command，尝试将第一个 CommandArgs 作为 Command
 		if (string.IsNullOrEmpty(command) && commandArgs.Count > 0)
@@ -213,14 +215,26 @@ internal class PackageManagerScript
 
 	private static string GetCurrentShell()
 	{
-		// 从环境变量中获取当前 Shell
-		string shell = Environment.GetEnvironmentVariable("SHELL");
-		if (string.IsNullOrEmpty(shell))
+        string? shell;
+        if (IsWindows())
 		{
-			// 如果没有找到 SHELL 环境变量，使用默认的 bash
-			shell = "/bin/bash";
+			shell = Environment.GetEnvironmentVariable("ComSpec"); // 通常指向 cmd.exe
+			if (string.IsNullOrEmpty(shell))
+			{
+				// 你可以根据需要处理没有找到的情况
+				shell = "cmd.exe"; // 默认值
+			}
 		}
-
+		else
+		{
+			// 从环境变量中获取当前 Shell
+			shell = Environment.GetEnvironmentVariable("SHELL");
+			if (string.IsNullOrEmpty(shell))
+			{
+				// 如果没有找到 SHELL 环境变量，使用默认的 bash
+				shell = "/bin/bash";
+			}
+		}
 		return shell;
 	}
 
@@ -435,5 +449,9 @@ internal class PackageManagerScript
 		{
 			Logger.Error($"{ex.Message}");
 		}
+	}
+	static bool IsWindows()
+	{
+		return Environment.OSVersion.Platform == PlatformID.Win32NT;
 	}
 }

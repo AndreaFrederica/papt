@@ -4,18 +4,18 @@ namespace papt
     public static class ReadmeConstants
     {
         public const string Content = @"# papt 
-## APT-like and Pacman-like wrapper for yay/pacman on Arch Linux
+## APT-like is Pacman-like wrapper for aur-helper/pacman on Arch Linux / Windows
 
 #### Build:
 ```
 clone https://github.com/AndreaFrederica/papt.git
 cd papt
-./build.sh
+./build.ps1
 ```
 
 #### Usage: 
 `
-papt <command> [package] [-pacman] [--noconfirm|-y] [-debug]
+papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-helper]
 `
 
 #### Commands:
@@ -46,9 +46,10 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug]
 ```
 #### Options:
 ```
-  -pacman              Force using pacman instead of yay.
-  --noconfirm, -y      Automatically confirm all prompts (for pacman or yay).
-  -debug               Show cli command before call packagemanager.
+  -pacman               Force using pacman instead of yay.
+  --noconfirm, -y       Automatically confirm all prompts (for pacman or yay).
+  -debug                Show cli command before call packagemanager.
+  -helper <aur-helper>  Use custom aur-helper
 ```
 
 #### Examples:
@@ -64,10 +65,12 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug]
   papt clean
   papt install vim --noconfirm
   papt remove vim -pacman
+  papt remove vim -pacman -helper yay
+  papt remove vim -pacman -helper paru
 ```
 #### Note:
-  This script is a wrapper for the yay AUR helper, designed to mimic APT and Pacman commands.
-  If yay is not installed, pacman will be used automatically with a warning message.
+  This script is a wrapper for aur-helper, designed to mimic APT and Pacman commands.
+  If yay/paru/custom-helper is not installed, pacman will be used automatically with a warning message.
 
 For more information, visit:  
   https://github.com/Jguer/yay  
