@@ -39,7 +39,7 @@ jobs:
           name: windows-build-artifacts
           path: |
             ./papt/bin/Release/net8.0/win-x64/publish/**
-            !**/*.pdb  # 排除 PDB 文件
+            !./papt/bin/Release/net8.0/win-x64/publish/*.pdb  # 排除 PDB 文件
 
       - name: Upload Linux build artifacts
         if: runner.os == 'Linux' && success()
@@ -48,4 +48,4 @@ jobs:
           name: linux-build-artifacts
           path: |
             ./papt/bin/Release/net8.0/linux-x64/publish/**
-            !**/*.pdb  # 排除 PDB 文件
+            !./papt/bin/Release/net8.0/linux-x64/publish/*.dbg  # 排除 DBG 文件
