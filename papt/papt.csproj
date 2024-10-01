@@ -9,6 +9,12 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <Configurations>Debug;Release;wsl</Configurations>
     <Platforms>AnyCPU;x64</Platforms>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
+
+  <Target Name="GenerateReadmeConstants" BeforeTargets="BeforeBuild">
+    <Exec
+      Command="pwsh -ExecutionPolicy Bypass -File $(ProjectDir)/GenerateReadmeConstants.ps1" />
+  </Target>
 
 </Project>

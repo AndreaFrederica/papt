@@ -1,15 +1,31 @@
-﻿using papt;
+﻿using Microsoft.VisualBasic;
+using papt;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+
+
+
 internal class PackageManagerScript
 {
+	const int PROG_EXIT_SUCCESS = 0;
+	const int PROG_EXIT_ERROR = 1;
 	private static string shell = "/bin/bash";
+
+	//! 增加对多种AurHelper的支持
+	private static Dictionary<string, int> aur_helpers_priority = new()
+	{
+		//! 请从1开始0被内部使用
+		["yay"] = 2,
+		["paru"] = 1
+	};
+	private static List<string> aur_helpers = aur_helpers_priority.Keys.ToList();
+
 	private static bool flag_debug_mode = false;
 
-	private static void Main(string[] args)
+	private static int Main(string[] args)
 	{
 		// 参数解析
 		var command = args.FirstOrDefault();
@@ -17,20 +33,50 @@ internal class PackageManagerScript
 
 		// 获取目前使用的shell
 		shell = GetCurrentShell();
-
 		// 检查是否使用 Pacman
 		bool pacmanFlag = commandArgs.Contains("-pacman");
-		string packageManager = CheckPackageManager(pacmanFlag);
-
+		//string packageManager = CheckPackageManager(pacmanFlag);
 		// 处理确认标志
 		string confirmFlag = commandArgs.Contains("--noconfirm") || commandArgs.Contains("-y") ? "--noconfirm" : "";
 
 		// 处理debug标志
-		flag_debug_mode= commandArgs.Contains("-debug");
+		flag_debug_mode = commandArgs.Contains("-debug");
 
 		// 移除已处理的标志
 		commandArgs = commandArgs.Where(arg => arg != "--noconfirm" && arg != "-y" && arg != "-pacman" && arg != "-debug").ToList();
 
+		for (int i = 0; i < commandArgs.Count; i++)
+		{
+			if (commandArgs[i] == "-helper")
+			{
+				string helper = commandArgs[i+1];
+				if(!aur_helpers.Contains(helper)){
+					aur_helpers.Add(helper);
+				}
+				aur_helpers_priority[helper] = 0;
+			}
+		}
+
+		aur_helpers.Add("pacman");
+		Dictionary<string, bool> aur_helpers_result = AreCommandsAvailable(aur_helpers);
+		if (aur_helpers_result["pacman"] is false)
+		{
+			Logger.Error("Can't find pacman in system.");
+			return PROG_EXIT_ERROR;
+		}
+		aur_helpers.Remove("pacman");
+
+		// 根据优先级对 AUR 助手进行排序
+		var sortedHelpers = aur_helpers
+			.Where(helper => aur_helpers_result[helper]) // 只保留存在的助手
+			.OrderByDescending(helper => aur_helpers_priority[helper])
+			.ToList();
+		
+		string packageManager = "pacman";
+		if (sortedHelpers.Count > 0){
+		packageManager = sortedHelpers[0];
+		Logger.Warning("Can't find any aur_helper in system");
+		}
 		// 如果未提供 Command，尝试将第一个 CommandArgs 作为 Command
 		if (string.IsNullOrEmpty(command) && commandArgs.Count > 0)
 		{
@@ -41,10 +87,12 @@ internal class PackageManagerScript
 			}
 			else
 			{
-				ShowUsage();
-				return;
+				HandleShowUsage();
+				return PROG_EXIT_ERROR;
 			}
 		}
+
+
 
 		// 处理命令
 		bool havePackage = false;
@@ -60,8 +108,8 @@ internal class PackageManagerScript
 				if (commandArgs.Count == 0)
 				{
 					Logger.Error($"No package specified for {command}");
-					ShowUsage();
-					return;
+					HandleShowUsage();
+					return PROG_EXIT_ERROR;
 				}
 
 				havePackage = true;
@@ -76,8 +124,8 @@ internal class PackageManagerScript
 				if (commandArgs.Count == 0)
 				{
 					Logger.Error($"No package specified for {command}");
-					ShowUsage();
-					return;
+					HandleShowUsage();
+					return PROG_EXIT_ERROR;
 				}
 
 				havePackage = true;
@@ -146,13 +194,21 @@ internal class PackageManagerScript
 
 			case "help":
 			case "-h":
-				ShowUsage();
+				HandleShowUsage();
 				break;
 
 			default:
-				HandleError(command);
+				if (command != null)
+				{
+					HandleError(command);
+				}
+				else
+				{
+					HandleShowUsage();
+				}
 				break;
 		}
+		return PROG_EXIT_SUCCESS;
 	}
 
 	private static string GetCurrentShell()
@@ -182,15 +238,22 @@ internal class PackageManagerScript
 	{
 		try
 		{
-			Process.Start(new ProcessStartInfo
+			using (var process = new Process())
 			{
-				FileName = "which",
-				Arguments = command,
-				RedirectStandardOutput = true,
-				UseShellExecute = false,
-				CreateNoWindow = true
-			})?.WaitForExit();
-			return true;
+				process.StartInfo.FileName = "which";
+				process.StartInfo.Arguments = command;
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = true;
+
+				process.Start();
+
+				string output = process.StandardOutput.ReadToEnd();
+				process.WaitForExit();
+
+				// 如果输出为空，表示命令不存在
+				return !string.IsNullOrEmpty(output.Trim());
+			}
 		}
 		catch
 		{
@@ -198,12 +261,48 @@ internal class PackageManagerScript
 		}
 	}
 
+	private static Dictionary<string, bool> AreCommandsAvailable(IEnumerable<string> commands)
+	{
+		var result = new Dictionary<string, bool>();
+
+		try
+		{
+			using (var process = new Process())
+			{
+				process.StartInfo.FileName = "which";
+				process.StartInfo.Arguments = string.Join(" ", commands);
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = true;
+
+				process.Start();
+				string output = process.StandardOutput.ReadToEnd();
+				process.WaitForExit();
+
+				foreach (var command in commands)
+				{
+					result[command] = output.Contains(command);
+				}
+			}
+		}
+		catch
+		{
+			foreach (var command in commands)
+			{
+				result[command] = false; // 如果发生异常，默认设置为false
+			}
+		}
+
+		return result;
+	}
+
+
 	private static bool IsPacmanCommand(string cmd)
 	{
 		return cmd.StartsWith("-S") || cmd.StartsWith("-R") || cmd.StartsWith("-Q") || cmd.StartsWith("-Syu") || cmd.StartsWith("-Sy") || cmd.StartsWith("-Sc") || cmd.StartsWith("-Ss") || cmd.StartsWith("-Qi") || cmd.StartsWith("-h");
 	}
 
-	private static void ShowUsage()
+	private static void HandleShowUsage()
 	{
 		//Console.WriteLine("Usage: <command> [options] [packages]");
 		// 显示更多帮助信息
@@ -231,7 +330,7 @@ internal class PackageManagerScript
 	{
 		if (!havePackage)
 		{
-			ShowUsage();
+			HandleShowUsage();
 			return;
 		}
 		RunCommand($"{packageManager} -S {packageString} {confirmFlag}");
@@ -241,7 +340,7 @@ internal class PackageManagerScript
 	{
 		if (!havePackage)
 		{
-			ShowUsage();
+			HandleShowUsage();
 			return;
 		}
 		RunCommand($"{packageManager} -R {packageString} {confirmFlag}");
@@ -251,7 +350,7 @@ internal class PackageManagerScript
 	{
 		if (!havePackage)
 		{
-			ShowUsage();
+			HandleShowUsage();
 			return;
 		}
 		RunCommand($"{packageManager} -Ss {packageString}");
@@ -261,7 +360,7 @@ internal class PackageManagerScript
 	{
 		if (!havePackage)
 		{
-			ShowUsage();
+			HandleShowUsage();
 			return;
 		}
 		RunCommand($"{packageManager} -Qi {packageString}");
@@ -280,7 +379,7 @@ internal class PackageManagerScript
 	private static void HandleError(string command)
 	{
 		Logger.Error($"Unknown command '{command}'");
-		ShowUsage();
+		HandleShowUsage();
 	}
 
 	//static void RunCommand(string command)
