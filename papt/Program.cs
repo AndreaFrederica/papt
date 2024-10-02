@@ -89,7 +89,7 @@ internal class PackageManagerScript
 			}
 			else
 			{
-				HandleShowUsage();
+				Handles.HandleShowUsage();
 				return PROG_EXIT_ERROR;
 			}
 		}
@@ -110,7 +110,7 @@ internal class PackageManagerScript
 				if (commandArgs.Count == 0)
 				{
 					Logger.Error($"No package specified for {command}");
-					HandleShowUsage();
+					Handles.HandleShowUsage();
 					return PROG_EXIT_ERROR;
 				}
 
@@ -126,7 +126,7 @@ internal class PackageManagerScript
 				if (commandArgs.Count == 0)
 				{
 					Logger.Error($"No package specified for {command}");
-					HandleShowUsage();
+					Handles.HandleShowUsage();
 					return PROG_EXIT_ERROR;
 				}
 
@@ -156,57 +156,57 @@ internal class PackageManagerScript
 		{
 			case "update":
 			case "-Sy":
-				HandleUpdate(packageManager);
+				Handles.HandleUpdate(packageManager);
 				break;
 
 			case "upgrade":
 			case "-Syu":
-				HandleUpgrade(packageManager, havePackage, packageString, confirmFlag);
+				Handles.HandleUpgrade(packageManager, havePackage, packageString, confirmFlag);
 				break;
 
 			case "install":
 			case "-S":
-				HandleInstall(packageManager, havePackage, packageString, confirmFlag);
+				Handles.HandleInstall(packageManager, havePackage, packageString, confirmFlag);
 				break;
 
 			case "remove":
 			case "-R":
-				HandleRemove(packageManager, havePackage, packageString, confirmFlag);
+				Handles.HandleRemove(packageManager, havePackage, packageString, confirmFlag);
 				break;
 
 			case "search":
 			case "-Ss":
-				HandleSearch(packageManager, havePackage, packageString);
+				Handles.HandleSearch(packageManager, havePackage, packageString);
 				break;
 
 			case "show":
 			case "-Qi":
-				HandleShow(packageManager, havePackage, packageString);
+				Handles.HandleShow(packageManager, havePackage, packageString);
 				break;
 
 			case "list":
 			case "-Q":
-				HandleList(packageManager);
+				Handles.HandleList(packageManager);
 				break;
 
 			case "clean":
 			case "-Sc":
-				HandleClean(packageManager, confirmFlag);
+				Handles.HandleClean(packageManager, confirmFlag);
 				break;
 
 			case "help":
 			case "-h":
-				HandleShowUsage();
+				Handles.HandleShowUsage();
 				break;
 
 			default:
 				if (command != null)
 				{
-					HandleError(command);
+					Handles.HandleError(command);
 				}
 				else
 				{
-					HandleShowUsage();
+					Handles.HandleShowUsage();
 				}
 				break;
 		}
@@ -215,11 +215,19 @@ internal class PackageManagerScript
 
 	private static string GetCurrentShell()
 	{
-        string? shell;
-        if (IsWindows())
+		string? shell;
+		if (IsWindows())
 		{
 			shell = Environment.GetEnvironmentVariable("ComSpec"); // 通常指向 cmd.exe
-			if (string.IsNullOrEmpty(shell))
+			if (IsCommandAvailable("pwsh"))
+			{
+				shell = "pwsh";
+			}
+			else if (IsCommandAvailable("powershell"))
+			{
+				shell = "powershell";
+			}
+			else if (string.IsNullOrEmpty(shell))
 			{
 				// 你可以根据需要处理没有找到的情况
 				shell = "cmd.exe"; // 默认值
@@ -316,114 +324,7 @@ internal class PackageManagerScript
 		return cmd.StartsWith("-S") || cmd.StartsWith("-R") || cmd.StartsWith("-Q") || cmd.StartsWith("-Syu") || cmd.StartsWith("-Sy") || cmd.StartsWith("-Sc") || cmd.StartsWith("-Ss") || cmd.StartsWith("-Qi") || cmd.StartsWith("-h");
 	}
 
-	private static void HandleShowUsage()
-	{
-		//Console.WriteLine("Usage: <command> [options] [packages]");
-		// 显示更多帮助信息
-		HelpUtility.ShowUsage();
-	}
-
-	private static void HandleUpdate(string packageManager)
-	{
-		RunCommand($"{packageManager} -Sy");
-	}
-
-	private static void HandleUpgrade(string packageManager, bool havePackage, string packageString, string confirmFlag)
-	{
-		if (havePackage)
-		{
-			RunCommand($"{packageManager} -Syu {packageString} {confirmFlag}");
-		}
-		else
-		{
-			RunCommand($"{packageManager} -Su {confirmFlag}");
-		}
-	}
-
-	private static void HandleInstall(string packageManager, bool havePackage, string packageString, string confirmFlag)
-	{
-		if (!havePackage)
-		{
-			HandleShowUsage();
-			return;
-		}
-		RunCommand($"{packageManager} -S {packageString} {confirmFlag}");
-	}
-
-	private static void HandleRemove(string packageManager, bool havePackage, string packageString, string confirmFlag)
-	{
-		if (!havePackage)
-		{
-			HandleShowUsage();
-			return;
-		}
-		RunCommand($"{packageManager} -R {packageString} {confirmFlag}");
-	}
-
-	private static void HandleSearch(string packageManager, bool havePackage, string packageString)
-	{
-		if (!havePackage)
-		{
-			HandleShowUsage();
-			return;
-		}
-		RunCommand($"{packageManager} -Ss {packageString}");
-	}
-
-	private static void HandleShow(string packageManager, bool havePackage, string packageString)
-	{
-		if (!havePackage)
-		{
-			HandleShowUsage();
-			return;
-		}
-		RunCommand($"{packageManager} -Qi {packageString}");
-	}
-
-	private static void HandleList(string packageManager)
-	{
-		RunCommand($"{packageManager} -Q");
-	}
-
-	private static void HandleClean(string packageManager, string confirmFlag)
-	{
-		RunCommand($"{packageManager} -Sc {confirmFlag}");
-	}
-
-	private static void HandleError(string command)
-	{
-		Logger.Error($"Unknown command '{command}'");
-		HandleShowUsage();
-	}
-
-	//static void RunCommand(string command)
-	//{
-	//	try
-	//	{
-	//		var process = new Process
-	//		{
-	//			StartInfo = new ProcessStartInfo
-	//			{
-	//				FileName = "/bin/bash",
-	//				Arguments = $"-c \"{command}\"",
-	//				RedirectStandardOutput = true,
-	//				UseShellExecute = false,
-	//				CreateNoWindow = true
-	//			}
-	//		};
-
-	//		process.Start();
-	//		string result = process.StandardOutput.ReadToEnd();
-	//		process.WaitForExit();
-
-	//		Console.WriteLine(result);
-	//	}
-	//	catch (Exception ex)
-	//	{
-	//		Console.WriteLine($"Error: {ex.Message}");
-	//	}
-	//}
-	private static void RunCommand(string command)
+	public static void RunCommand(string command)
 	{
 		try
 		{
@@ -437,69 +338,32 @@ internal class PackageManagerScript
 				{
 					FileName = shell,
 					Arguments = $"-c \"{command}\"",
-					UseShellExecute = true,
-					CreateNoWindow = true
+					UseShellExecute = false,
+					CreateNoWindow = false
 				}
 			};
-			if(IsWindows()){
-				if (shell.Contains("cmd.exe"))
+			if (IsWindows())
+			{
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+                if (shell.Contains("cmd.exe"))
 				{
-                    process = new Process
-                    {
-                        StartInfo = new ProcessStartInfo
-                        {
-							
-                            FileName = shell,
-                            Arguments = $"/C \"{command}\"",
-                            //Arguments = $"-h",
-                            UseShellExecute = false,
-							//RedirectStandardInput = true, // 重定向标准输入
-							//RedirectStandardOutput = true, // 重定向标准输出
-							//RedirectStandardError = true, // 重定向标准错误
+					process = new Process
+					{
+						StartInfo = new ProcessStartInfo
+						{
+
+							FileName = shell,
+							Arguments = $"/C \"{command}\"",
+							UseShellExecute = false,
 							CreateNoWindow = false // 不创建新窗口
-                        }
-                    };
-					//process.OutputDataReceived += (sender, args) =>
-					//{
-					//	if (!string.IsNullOrEmpty(args.Data))
-					//	{
-					//		Console.WriteLine(args.Data); // 输出数据
-					//	}
-					//};
-
-					//process.ErrorDataReceived += (sender, args) =>
-					//{
-					//	if (!string.IsNullOrEmpty(args.Data))
-					//	{
-					//		Console.Error.WriteLine(args.Data); // 输出错误
-					//	}
-					//};
+						}
+					};
 				}
-				//? 如果shell是pwsh等 则和Linux调用方式一样
-				//TODO 但是还会创建一个新窗口
-				// 不使用shell创建现在直接没反应了
-
-			}
+#pragma warning restore CS8602 // 解引用可能出现空引用。
+                              //? 如果shell是pwsh等 则和Linux调用方式一样
+            }
 
 			process.Start();
-			//if (IsWindows())
-			//{
-			//	process.BeginOutputReadLine(); // 开始异步读取输出
-			//	process.BeginErrorReadLine(); // 开始异步读取错误
-
-			//	// 允许从标准输入写入数据
-			//	using (var writer = process.StandardInput)
-			//	{
-			//		if (writer.BaseStream.CanWrite)
-			//		{
-			//			string userInput;
-			//			while ((userInput = Console.ReadLine()) != null) // 从控制台读取输入
-			//			{
-			//				writer.WriteLine(userInput); // 将输入写入进程
-			//			}
-			//		}
-			//	}
-			//}
 			process.WaitForExit();
 		}
 		catch (Exception ex)
