@@ -117,10 +117,9 @@ internal class PackageManagerScript
 				}
 
 				havePackage = true;
-				//TODO 这个映射应该以后独立出去 而不是挤在这里
 				if (commandArgs.Contains("build-essential")){
 					Logger.Warning("Can you want install base-devel? [Y/n]");
-					if(confirmFlag != "" || Console.ReadLine() == "Y"){
+					if(confirmFlag != "" || ISConsoleInputY()){
 						commandArgs.Remove("build-essential");
 						commandArgs.Add("base-devel");
 					}
@@ -384,5 +383,12 @@ internal class PackageManagerScript
 	static bool IsWindows()
 	{
 		return Environment.OSVersion.Platform == PlatformID.Win32NT;
+	}
+	static bool ISConsoleInputY(){
+		String? line = Console.ReadLine();
+		if(line != null && (line == "Y" || line == "y")){
+			return true;
+		}
+		return false;
 	}
 }
