@@ -1,7 +1,8 @@
 {
   "profiles": {
     "papt": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "install build-essential"
     }
   }
 }

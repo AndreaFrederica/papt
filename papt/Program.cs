@@ -388,7 +388,7 @@ internal class PackageManagerScript
 		String? line = Console.ReadLine();
 		if(line != null && (line == "Y" || line == "y")){
 			return true;
-		}else if(line == null){
+		}else if(line == ""){
 			return default_val;
 		}
 		return false;
