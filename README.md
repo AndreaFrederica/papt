@@ -1,5 +1,5 @@
 # papt 
-## APT-like is Pacman-like wrapper for aur-helper/pacman on Arch Linux / Windows
+## papt is Pacman-like wrapper for aur-helper/pacman on Arch Linux / Windows
 
 #### Build:
 ```
@@ -41,8 +41,8 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
 ```
 #### Options:
 ```
-  -pacman               Force using pacman instead of yay.
-  --noconfirm, -y       Automatically confirm all prompts (for pacman or yay).
+  -pacman               Force using pacman instead of aur-helper.
+  --noconfirm, -y       Automatically confirm all prompts (for pacman or aur-helper).
   -debug                Show cli command before call packagemanager.
   -helper <aur-helper>  Use custom aur-helper
 ```
@@ -64,10 +64,15 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
   papt remove vim -pacman -helper paru
 ```
 #### Note:
-  This script is a wrapper for aur-helper, designed to mimic APT and Pacman commands.
-  If yay/paru/custom-helper is not installed, pacman will be used automatically with a warning message.
+  This program is a wrapper for aur-helper, designed to mimic APT and Pacman commands.  
+  If yay/paru/custom-helper is not installed, pacman will be used automatically with a warning message.  
+  Now papt can translate some package names. For example, `build-essential --> base-devel`.
+  On Windows, papt will first use pwsh/powershell.  
+  To use papt/pacman, Windows users should install Cygwin/MSYS2 and add `/user/bin` `/bin` ... dir to their system path.  
+  You can download MSYS2 from there https://www.msys2.org/
 
 For more information, visit:  
   https://github.com/Jguer/yay  
+  https://github.com/Morganamilo/paru  
   https://wiki.archlinux.org/title/Pacman  
   https://github.com/AndreaFrederica/papt  

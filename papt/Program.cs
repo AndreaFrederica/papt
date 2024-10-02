@@ -117,6 +117,14 @@ internal class PackageManagerScript
 				}
 
 				havePackage = true;
+				//TODO 这个映射应该以后独立出去 而不是挤在这里
+				if (commandArgs.Contains("build-essential")){
+					Logger.Warning("Can you want install base-devel? [Y/n]");
+					if(confirmFlag != "" || Console.ReadLine() == "Y"){
+						commandArgs.Remove("build-essential");
+						commandArgs.Add("base-devel");
+					}
+				}
 				packageString = string.Join(" ", commandArgs);
 				Logger.Info($"Packages = {packageString}");
 				break;
