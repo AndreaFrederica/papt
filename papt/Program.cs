@@ -448,31 +448,33 @@ internal class PackageManagerScript
                     {
                         StartInfo = new ProcessStartInfo
                         {
+							
                             FileName = shell,
                             Arguments = $"/C \"{command}\"",
+                            //Arguments = $"-h",
                             UseShellExecute = false,
-                            RedirectStandardInput = true, // 重定向标准输入
-                            RedirectStandardOutput = true, // 重定向标准输出
-                            RedirectStandardError = true, // 重定向标准错误
-                            CreateNoWindow = true // 不创建新窗口
+							//RedirectStandardInput = true, // 重定向标准输入
+							//RedirectStandardOutput = true, // 重定向标准输出
+							//RedirectStandardError = true, // 重定向标准错误
+							CreateNoWindow = false // 不创建新窗口
                         }
                     };
-                    process.OutputDataReceived += (sender, args) =>
-                    {
-                        if (!string.IsNullOrEmpty(args.Data))
-                        {
-                            Console.WriteLine(args.Data); // 输出数据
-                        }
-                    };
+					//process.OutputDataReceived += (sender, args) =>
+					//{
+					//	if (!string.IsNullOrEmpty(args.Data))
+					//	{
+					//		Console.WriteLine(args.Data); // 输出数据
+					//	}
+					//};
 
-                    process.ErrorDataReceived += (sender, args) =>
-                    {
-                        if (!string.IsNullOrEmpty(args.Data))
-                        {
-                            Console.Error.WriteLine(args.Data); // 输出错误
-                        }
-                    };
-                }
+					//process.ErrorDataReceived += (sender, args) =>
+					//{
+					//	if (!string.IsNullOrEmpty(args.Data))
+					//	{
+					//		Console.Error.WriteLine(args.Data); // 输出错误
+					//	}
+					//};
+				}
 				//? 如果shell是pwsh等 则和Linux调用方式一样
 				//TODO 但是还会创建一个新窗口
 				// 不使用shell创建现在直接没反应了
@@ -480,24 +482,24 @@ internal class PackageManagerScript
 			}
 
 			process.Start();
-			if (IsWindows())
-			{
-                process.BeginOutputReadLine(); // 开始异步读取输出
-                process.BeginErrorReadLine(); // 开始异步读取错误
+			//if (IsWindows())
+			//{
+			//	process.BeginOutputReadLine(); // 开始异步读取输出
+			//	process.BeginErrorReadLine(); // 开始异步读取错误
 
-                // 允许从标准输入写入数据
-                using (var writer = process.StandardInput)
-                {
-                    if (writer.BaseStream.CanWrite)
-                    {
-                        string userInput;
-                        while ((userInput = Console.ReadLine()) != null) // 从控制台读取输入
-                        {
-                            writer.WriteLine(userInput); // 将输入写入进程
-                        }
-                    }
-                }
-            }
+			//	// 允许从标准输入写入数据
+			//	using (var writer = process.StandardInput)
+			//	{
+			//		if (writer.BaseStream.CanWrite)
+			//		{
+			//			string userInput;
+			//			while ((userInput = Console.ReadLine()) != null) // 从控制台读取输入
+			//			{
+			//				writer.WriteLine(userInput); // 将输入写入进程
+			//			}
+			//		}
+			//	}
+			//}
 			process.WaitForExit();
 		}
 		catch (Exception ex)
