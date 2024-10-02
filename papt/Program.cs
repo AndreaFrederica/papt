@@ -45,6 +45,8 @@ internal class PackageManagerScript
 		// 移除已处理的标志
 		commandArgs = commandArgs.Where(arg => arg != "--noconfirm" && arg != "-y" && arg != "-pacman" && arg != "-debug").ToList();
 
+		Logger.Init(flag_debug_mode);
+
 		for (int i = 0; i < commandArgs.Count; i++)
 		{
 			if (commandArgs[i] == "-helper")

@@ -13,8 +13,12 @@
   </PropertyGroup>
 
   <Target Name="GenerateReadmeConstants" BeforeTargets="BeforeBuild">
-    <Exec
-      Command="pwsh -ExecutionPolicy Bypass -File $(ProjectDir)/GenerateReadmeConstants.ps1" />
+    <Exec Command="pwsh -ExecutionPolicy Bypass -File $(ProjectDir)/GenerateReadmeConstants.ps1" />
   </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+  </ItemGroup>
 
 </Project>

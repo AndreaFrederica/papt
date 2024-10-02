@@ -1,48 +1,54 @@
-﻿using System;
+﻿using Serilog;
+using Serilog.Configuration;
+using Serilog.Debugging;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace papt
 {
-	public static class Logger
-	{
-		public static void Trace(string message)
-		{
-			Log(message, ConsoleColor.Gray, "TRACE");
-		}
 
-		public static void Debug(string message)
-		{
-			Log(message, ConsoleColor.Blue, "DEBUG");
-		}
+    public static class Logger
+    {
+        public static void Init(bool debug_flag = false)
+        {
+            if (debug_flag)
+            {
+                Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .Enrich.FromLogContext()
+                .MinimumLevel.Debug()
+                .CreateLogger();
+            }
+            else
+            {
+                Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .Enrich.FromLogContext()
+                .MinimumLevel.Information()
+                .CreateLogger();
+            }
+        }
+        public static void Debug(string message)
+        {
+            Log.Debug(message);
+        }
 
-		public static void Info(string message)
-		{
-			Log(message, ConsoleColor.White, "INFO");
-		}
+        public static void Info(string message)
+        {
+            Log.Information(message);
+        }
 
-		public static void Warning(string message)
-		{
-			Log(message, ConsoleColor.Yellow, "WARNING");
-		}
+        public static void Warning(string message)
+        {
+            Log.Warning(message);
+        }
 
-		public static void Error(string message)
-		{
-			Log(message, ConsoleColor.Red, "ERROR");
-		}
-
-		public static void Critical(string message)
-		{
-			Log(message, ConsoleColor.Magenta, "CRITICAL");
-		}
-
-		private static void Log(string message, ConsoleColor color, string level)
-		{
-			Console.ForegroundColor = color;
-			Console.WriteLine($"[{DateTime.Now}] [{level}] {message}");
-			Console.ResetColor();
-		}
-	}
+        public static void Error(string message)
+        {
+            Log.Error(message);
+        }
+    }
 }
