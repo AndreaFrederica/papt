@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "papt": {
+      "commandName": "Project",
+      "commandLineArgs": "list"
+    }
+  }
+}
