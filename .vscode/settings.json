@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "autoremove",
         "devel",
         "MSYS",
         "noconfirm",
@@ -8,6 +9,8 @@
         "papt",
         "paru",
         "pwsh",
+        "Qdtq",
         "Serilog"
-    ]
+    ],
+    "commentTranslate.source": "Google"
 }

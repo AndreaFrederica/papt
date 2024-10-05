@@ -19,6 +19,7 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
   upgrade [package]     Upgrade all installed packages or a specific package.
   install <package>     Install the specified package.
   remove <package>      Remove the specified package.
+  autoremove <package>  Autoremove the specified package and its dependencies.
   search <package>      Search for a package in the repositories.
   show <package>        Display detailed information about the specified package.
   list                  List all installed packages.
@@ -38,13 +39,14 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
   -Q                    List all installed packages.
   -Sc                   Clean the package cache.
   -h                    Show this help message.
+  ...                   Other pacman commands will call package-manager directly.
 ```
 #### Options:
 ```
   -pacman               Force using pacman instead of aur-helper.
   --noconfirm, -y       Automatically confirm all prompts (for pacman or aur-helper).
   -debug                Show cli command before call packagemanager.
-  -helper <aur-helper>  Use custom aur-helper
+  -helper <aur-helper>  Use custom aur-helper.
 ```
 
 #### Examples:

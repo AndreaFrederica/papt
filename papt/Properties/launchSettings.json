@@ -2,7 +2,7 @@
   "profiles": {
     "papt": {
       "commandName": "Project",
-      "commandLineArgs": "install build-essential"
+      "commandLineArgs": "-Qdtq"
     }
   }
 }

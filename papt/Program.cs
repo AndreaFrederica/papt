@@ -208,10 +208,22 @@ internal class PackageManagerScript
 				Handles.HandleShowUsage();
 				break;
 
+			case "autoremove":
+				Handles.HandleAutoRemove(packageManager, havePackage, packageString, confirmFlag);
+				break;
 			default:
 				if (command != null)
 				{
+					//? 长得像pacman的命令直接透传
+					//? (?!-h)(?!--help)(?!--version)(-[A-Za-z-]*)
+					//? 符合pacman指令格式
+					if (System.Text.RegularExpressions.Regex.IsMatch(command, "(?!-h)(?!--help)(?!--version)(-[A-Za-z-]*)")){
+						string raw_command = command + string.Join(" ",commandArgs);
+						Logger.Info($"Will run {packageManager} {raw_command}");
+						Handles.HandleRAWcommand(packageManager, raw_command);
+					}
 					Handles.HandleError(command);
+					break;
 				}
 				else
 				{

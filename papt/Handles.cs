@@ -82,4 +82,18 @@ internal static class Handles
             PackageManagerScript.RunCommand($"{packageManager} -Su {confirmFlag}");
         }
     }
+
+    public static void HandleRAWcommand(string packageManager, string raw_command){
+        PackageManagerScript.RunCommand($"{packageManager} {raw_command}");
+    }
+    public static void HandleAutoRemove(string packageManager, bool havePackage, string packageString, string confirmFlag)
+    {
+        if (!havePackage)
+        {
+            HandleShowUsage();
+            return;
+        }
+        PackageManagerScript.RunCommand($"{packageManager} -R {packageString} {confirmFlag}");
+        PackageManagerScript.RunCommand($"{packageManager} -Rns $({packageManager} -Qdtq) {confirmFlag}");
+    }
 }

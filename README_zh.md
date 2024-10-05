@@ -19,6 +19,7 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
   upgrade [package]     升级所有已安装的软件包或特定软件包。
   install <package>     安装指定软件包。
   remove <package>      删除指定软件包。
+  autoremove <package>  自动删除指定软件包和依赖。
   search <package>      在软件仓库中搜索软件包。
   show <package>        显示指定软件包的详细信息。
   list                  列出所有已安装的软件包。
@@ -38,6 +39,7 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
   -Q                    列出所有已安装的软件包。
   -Sc                   清理软件包缓存。
   -h                    显示此帮助信息。
+  ...                   其他pacman命令会直接通过包管理器调用。
 ```
 #### 选项:
 ```
