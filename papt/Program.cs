@@ -221,9 +221,9 @@ internal class PackageManagerScript
 						string raw_command = command + string.Join(" ",commandArgs);
 						Logger.Info($"Will run {packageManager} {raw_command}");
 						Handles.HandleRAWcommand(packageManager, raw_command);
+						break;
 					}
 					Handles.HandleError(command);
-					break;
 				}
 				else
 				{
