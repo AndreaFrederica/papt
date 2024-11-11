@@ -61,7 +61,7 @@ internal class PackageManagerScript
 		}
 
 		aur_helpers.Add("pacman");
-		Dictionary<string, bool> aur_helpers_result = AreCommandsAvailable(aur_helpers);
+		Dictionary<string, bool> aur_helpers_result = Utilities.AreCommandsAvailable(aur_helpers);
 		if (aur_helpers_result["pacman"] is false)
 		{
 			Logger.Error("Can't find pacman in system.");
@@ -240,11 +240,11 @@ internal class PackageManagerScript
 		if (IsWindows())
 		{
 			shell = Environment.GetEnvironmentVariable("ComSpec"); // 通常指向 cmd.exe
-			if (IsCommandAvailable("pwsh"))
+			if (Utilities.IsCommandAvailable("pwsh"))
 			{
 				shell = "pwsh";
 			}
-			else if (IsCommandAvailable("powershell"))
+			else if (Utilities.IsCommandAvailable("powershell"))
 			{
 				shell = "powershell";
 			}
@@ -269,7 +269,7 @@ internal class PackageManagerScript
 
 	private static string CheckPackageManager(bool pacmanFlag)
 	{
-		if (pacmanFlag || !IsCommandAvailable("yay"))
+		if (pacmanFlag || !Utilities.IsCommandAvailable("yay"))
 		{
 			Logger.Warning("Using pacman instead of yay.");
 			return "pacman";
@@ -277,67 +277,7 @@ internal class PackageManagerScript
 		return "yay";
 	}
 
-	private static bool IsCommandAvailable(string command)
-	{
-		try
-		{
-			using (var process = new Process())
-			{
-				process.StartInfo.FileName = "which";
-				process.StartInfo.Arguments = command;
-				process.StartInfo.RedirectStandardOutput = true;
-				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = true;
 
-				process.Start();
-
-				string output = process.StandardOutput.ReadToEnd();
-				process.WaitForExit();
-
-				// 如果输出为空，表示命令不存在
-				return !string.IsNullOrEmpty(output.Trim());
-			}
-		}
-		catch
-		{
-			return false;
-		}
-	}
-
-	private static Dictionary<string, bool> AreCommandsAvailable(IEnumerable<string> commands)
-	{
-		var result = new Dictionary<string, bool>();
-
-		try
-		{
-			using (var process = new Process())
-			{
-				process.StartInfo.FileName = "which";
-				process.StartInfo.Arguments = string.Join(" ", commands);
-				process.StartInfo.RedirectStandardOutput = true;
-				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = true;
-
-				process.Start();
-				string output = process.StandardOutput.ReadToEnd();
-				process.WaitForExit();
-
-				foreach (var command in commands)
-				{
-					result[command] = output.Contains(command);
-				}
-			}
-		}
-		catch
-		{
-			foreach (var command in commands)
-			{
-				result[command] = false; // 如果发生异常，默认设置为false
-			}
-		}
-
-		return result;
-	}
 
 
 	private static bool IsPacmanCommand(string cmd)
