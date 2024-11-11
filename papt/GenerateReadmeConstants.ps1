@@ -13,7 +13,7 @@ namespace Papt
     {
         public const string Content =
 """
-        $content
+$content
 """;
     }
 }
