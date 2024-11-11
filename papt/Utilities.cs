@@ -120,6 +120,17 @@ namespace papt
             return result;
         }
 
+        public static string CheckPackageManager(bool pacmanFlag)
+        {
+            if (pacmanFlag || !Utilities.IsCommandAvailable("yay"))
+            {
+                Logger.Warning("Using pacman instead of yay.");
+                return "pacman";
+            }
+            return "yay";
+        }
+
+
     }
 }
 

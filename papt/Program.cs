@@ -76,11 +76,14 @@ internal class PackageManagerScript
 			.ToList();
 
 		string packageManager = "pacman";
-		if (sortedHelpers.Count > 0)
+		if (sortedHelpers.Count <= 0)
 		{
-			packageManager = sortedHelpers[0];
 			Logger.Warning("Can't find any aur_helper in system");
 		}
+		else
+		{
+            packageManager = sortedHelpers[0];
+        }
 		// 如果未提供 Command，尝试将第一个 CommandArgs 作为 Command
 		if (string.IsNullOrEmpty(command) && commandArgs.Count > 0)
 		{
@@ -266,19 +269,6 @@ internal class PackageManagerScript
 		}
 		return shell;
 	}
-
-	private static string CheckPackageManager(bool pacmanFlag)
-	{
-		if (pacmanFlag || !Utilities.IsCommandAvailable("yay"))
-		{
-			Logger.Warning("Using pacman instead of yay.");
-			return "pacman";
-		}
-		return "yay";
-	}
-
-
-
 
 	private static bool IsPacmanCommand(string cmd)
 	{
