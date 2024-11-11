@@ -1,6 +1,6 @@
 # papt
 
-## papt is Pacman-like wrapper for aur-helper/pacman on Arch Linux / Windows
+## papt is APT-like wrapper for aur-helper/pacman on Arch Linux / Windows
 
 #### Build:
 
