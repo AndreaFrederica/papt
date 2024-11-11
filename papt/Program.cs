@@ -25,19 +25,28 @@ public class PackageManagerScript
 
     private static int Main(string[] args)
     {
-        ConfigTools.InitializeConfig();
-        // 判空并赋值
-        if (ConfigTools.AurHelpersPriority != null)
+        try
         {
-            aur_helpers_priority = ConfigTools.AurHelpersPriority;
+            ConfigTools.InitializeConfig();
+
+            // Check for null and assign value
+            if (ConfigTools.AurHelpersPriority != null)
+            {
+                aur_helpers_priority = ConfigTools.AurHelpersPriority;
+            }
+            else
+            {
+                Logger.Error("Failed to load the config file.");
+                return PROG_EXIT_ERROR;
+            }
+            aur_helpers = aur_helpers_priority.Keys.ToList();
         }
-        else
+        catch (Exception ex)
         {
-            Logger.Error("Can't load config filr.");
+            Logger.Error($"An exception occurred while initializing the config: {ex.Message}");
+            Logger.Error($"Stack Trace: {ex.StackTrace}");
             return PROG_EXIT_ERROR;
         }
-
-        aur_helpers = aur_helpers_priority.Keys.ToList();
     // 参数解析
     var command = args.FirstOrDefault();
         var commandArgs = args.Skip(1).ToList();

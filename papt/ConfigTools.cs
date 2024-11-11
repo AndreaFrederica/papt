@@ -10,33 +10,48 @@ namespace Papt
     {
         private static readonly string ConfigFilePath = GetConfigFilePath();
         public static Dictionary<string, int>? AurHelpersPriority { get; private set; }
+
         /// <summary>
-        /// 获取配置文件路径，根据操作系统适配
+        /// 获取配置文件路径，根据操作系统和用户适配
         /// </summary>
         private static string GetConfigFilePath()
         {
             string configFileName = "papt.json5";
+            string configDirectory;
             string homeDirectory;
 
             if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
             {
-                homeDirectory = Environment.GetEnvironmentVariable("HOME");
+                // 检查是否为 root 用户
+                if (Environment.GetEnvironmentVariable("USER") == "root")
+                {
+                    configDirectory = "/etc/papt";
+                }
+                else
+                {
+                    homeDirectory = Environment.GetEnvironmentVariable("HOME");
+                    if (string.IsNullOrEmpty(homeDirectory))
+                    {
+                        throw new InvalidOperationException("Unable to determine the home directory.");
+                    }
+                    configDirectory = Path.Combine(homeDirectory, ".config", "papt");
+                }
             }
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
                 homeDirectory = Environment.GetEnvironmentVariable("USERPROFILE");
+                if (string.IsNullOrEmpty(homeDirectory))
+                {
+                    throw new InvalidOperationException("Unable to determine the home directory.");
+                }
+                configDirectory = Path.Combine(homeDirectory, "papt");
             }
             else
             {
                 throw new InvalidOperationException("Unsupported platform");
             }
 
-            if (string.IsNullOrEmpty(homeDirectory))
-            {
-                throw new InvalidOperationException("Unable to determine the home directory.");
-            }
-
-            return Path.Combine(homeDirectory, "papt", configFileName);
+            return Path.Combine(configDirectory, configFileName);
         }
 
         /// <summary>
@@ -49,7 +64,7 @@ namespace Papt
                 // 检查配置文件是否存在，不存在则创建默认文件夹
                 if (!File.Exists(ConfigFilePath))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath));
+                    Directory.CreateDirectory(Path.GetDirectoryName(ConfigFilePath)!);
                     File.WriteAllText(ConfigFilePath, RawDefaultConfig.DefaultConfigContent);
                     Logger.Info($"Default config file created at: {ConfigFilePath}");
                 }
