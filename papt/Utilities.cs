@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace papt
+namespace Papt
 {
     public class Utilities
     {

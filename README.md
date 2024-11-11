@@ -68,10 +68,20 @@ papt <command> [package] [-pacman] [--noconfirm|-y] [-debug] <-helper> [aur-help
 #### Note:
   This program is a wrapper for aur-helper, designed to mimic APT and Pacman commands.  
   If yay/paru/custom-helper is not installed, pacman will be used automatically with a warning message.  
+  You can find papt.json5 in /home/papt. Edit papt.json5 to change the priority of aur-helper.
+  example
+  ```
+{
+  //? Default configuration
+  //! Configuration of the priority of the aur-helper, start with 1, the lower the value the higher the priority.
+  "yay": 2,
+  "paru": 1
+}
+  ```
   Now papt can translate some package names. For example, `build-essential --> base-devel`.
   On Windows, papt will first use pwsh/powershell.  
   To use papt/pacman, Windows users should install Cygwin/MSYS2 and add `/user/bin` `/bin` ... dir to their system path.  
-  You can download MSYS2 from there https://www.msys2.org/
+  You can download MSYS2 from there https://www.msys2.org/  
 
 For more information, visit:  
   https://github.com/Jguer/yay  

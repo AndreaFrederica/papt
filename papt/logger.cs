@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-namespace papt
+namespace Papt
 {
 
     public static class Logger
