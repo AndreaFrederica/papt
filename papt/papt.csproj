@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="libraries\Json5.net\" />
+    <ProjectReference Include="..\Json5\Json5.csproj" />
   </ItemGroup>
 
 </Project>

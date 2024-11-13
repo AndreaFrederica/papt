@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-
+#nullable enable
 namespace Papt;
 
 public class PackageManagerScript
@@ -18,8 +18,8 @@ public class PackageManagerScript
     //};
 
     // 初始化配置文件
-    private static Dictionary<string, int> aur_helpers_priority;
-    private static List<string> aur_helpers;
+    private static Dictionary<string, int>? aur_helpers_priority;
+    private static List<string>? aur_helpers;
 
     private static bool flag_debug_mode = false;
 

@@ -4,7 +4,7 @@ namespace Papt
 {
     public class Utilities
     {
-        public static string Which(string command)
+        public static string? Which(string command)
         {
             // 获取 PATH 环境变量
             var paths = Environment.GetEnvironmentVariable("PATH");
@@ -18,7 +18,7 @@ namespace Papt
 
             // 获取系统的可执行文件后缀（如 Windows 的 ".exe"）
             var extensions = Environment.OSVersion.Platform == PlatformID.Win32NT ?
-                Environment.GetEnvironmentVariable("PATHEXT")?.Split(';') : new[] { "" };
+                Environment.GetEnvironmentVariable("PATHEXT")?.Split(';') ?? [""] : [""];
 
             // 遍历 PATH 中的每个目录
             foreach (var dir in pathDirs)
@@ -103,7 +103,7 @@ namespace Papt
         public static bool IsCommandAvailable(string command)
         {
             // 使用 Which 函数查找命令是否存在
-            string result = Which(command);
+            var result = Which(command);
             return !string.IsNullOrEmpty(result);
         }
 

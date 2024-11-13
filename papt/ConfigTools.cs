@@ -29,7 +29,7 @@ namespace Papt
                 }
                 else
                 {
-                    homeDirectory = Environment.GetEnvironmentVariable("HOME");
+                    homeDirectory = Environment.GetEnvironmentVariable("HOME")!;
                     if (string.IsNullOrEmpty(homeDirectory))
                     {
                         throw new InvalidOperationException("Unable to determine the home directory.");
@@ -39,7 +39,7 @@ namespace Papt
             }
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
-                homeDirectory = Environment.GetEnvironmentVariable("USERPROFILE");
+                homeDirectory = Environment.GetEnvironmentVariable("USERPROFILE")!;
                 if (string.IsNullOrEmpty(homeDirectory))
                 {
                     throw new InvalidOperationException("Unable to determine the home directory.");
