@@ -1,9 +1,17 @@
-﻿using System.Diagnostics;
-
-namespace Papt
+﻿namespace Papt
 {
+    using System.Diagnostics;
+
+    /// <summary>
+    /// Defines the <see cref="Utilities" />
+    /// </summary>
     public class Utilities
     {
+        /// <summary>
+        /// The Which
+        /// </summary>
+        /// <param name="command">The command<see cref="string"/></param>
+        /// <returns>The <see cref="string?"/></returns>
         public static string? Which(string command)
         {
             // 获取 PATH 环境变量
@@ -39,6 +47,11 @@ namespace Papt
             return null;
         }
 
+        /// <summary>
+        /// The IsCommandAvailable_SystemWhich
+        /// </summary>
+        /// <param name="command">The command<see cref="string"/></param>
+        /// <returns>The <see cref="bool"/></returns>
         public static bool IsCommandAvailable_SystemWhich(string command)
         {
             try
@@ -66,6 +79,11 @@ namespace Papt
             }
         }
 
+        /// <summary>
+        /// The AreCommandsAvailable_SystemWhich
+        /// </summary>
+        /// <param name="commands">The commands<see cref="IEnumerable{string}"/></param>
+        /// <returns>The <see cref="Dictionary{string, bool}"/></returns>
         public static Dictionary<string, bool> AreCommandsAvailable_SystemWhich(IEnumerable<string> commands)
         {
             var result = new Dictionary<string, bool>();
@@ -100,6 +118,12 @@ namespace Papt
         }
 
         // 判断单个命令是否存在
+
+        /// <summary>
+        /// The IsCommandAvailable
+        /// </summary>
+        /// <param name="command">The command<see cref="string"/></param>
+        /// <returns>The <see cref="bool"/></returns>
         public static bool IsCommandAvailable(string command)
         {
             // 使用 Which 函数查找命令是否存在
@@ -108,6 +132,12 @@ namespace Papt
         }
 
         // 判断多个命令是否存在
+
+        /// <summary>
+        /// The AreCommandsAvailable
+        /// </summary>
+        /// <param name="commands">The commands<see cref="IEnumerable{string}"/></param>
+        /// <returns>The <see cref="Dictionary{string, bool}"/></returns>
         public static Dictionary<string, bool> AreCommandsAvailable(IEnumerable<string> commands)
         {
             var result = new Dictionary<string, bool>();
@@ -120,6 +150,11 @@ namespace Papt
             return result;
         }
 
+        /// <summary>
+        /// The CheckPackageManager
+        /// </summary>
+        /// <param name="pacmanFlag">The pacmanFlag<see cref="bool"/></param>
+        /// <returns>The <see cref="string"/></returns>
         public static string CheckPackageManager(bool pacmanFlag)
         {
             if (pacmanFlag || !Utilities.IsCommandAvailable("yay"))
@@ -129,8 +164,18 @@ namespace Papt
             }
             return "yay";
         }
-
-
+        public static bool ISConsoleInputY(bool default_val)
+        {
+            String? line = Console.ReadLine();
+            if (line != null && (line == "Y" || line == "y"))
+            {
+                return true;
+            }
+            else if (line == "")
+            {
+                return default_val;
+            }
+            return false;
+        }
     }
 }
-

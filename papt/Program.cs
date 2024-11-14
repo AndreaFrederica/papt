@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using papt;
+using System.Diagnostics;
 
 #nullable enable
 namespace Papt;
@@ -47,8 +48,8 @@ public class PackageManagerScript
             Logger.Error($"Stack Trace: {ex.StackTrace}");
             return PROG_EXIT_ERROR;
         }
-    // 参数解析
-    var command = args.FirstOrDefault();
+        // 参数解析
+        var command = args.FirstOrDefault();
         var commandArgs = args.Skip(1).ToList();
 
         // 获取目前使用的shell
@@ -119,8 +120,6 @@ public class PackageManagerScript
             }
         }
 
-
-
         // 处理命令
         bool havePackage = false;
         string packageString = string.Empty;
@@ -140,15 +139,16 @@ public class PackageManagerScript
                 }
 
                 havePackage = true;
-                if (commandArgs.Contains("build-essential"))
-                {
-                    Logger.Warning("Can you want install base-devel? [Y/n]");
-                    if (confirmFlag != "" || ISConsoleInputY(true))
-                    {
-                        commandArgs.Remove("build-essential");
-                        commandArgs.Add("base-devel");
-                    }
-                }
+                //if (commandArgs.Contains("build-essential"))
+                //{
+                //    Logger.Warning("Can you want install base-devel? [Y/n]");
+                //    if (confirmFlag != "" || ISConsoleInputY(true))
+                //    {
+                //        commandArgs.Remove("build-essential");
+                //        commandArgs.Add("base-devel");
+                //    }
+                //}
+                commandArgs = PackageTranslate.TranslatePackage(commandArgs, confirmFlag != "");
                 packageString = string.Join(" ", commandArgs);
                 Logger.Info($"Packages = {packageString}");
                 break;
@@ -349,18 +349,5 @@ public class PackageManagerScript
     {
         return Environment.OSVersion.Platform == PlatformID.Win32NT;
     }
-    static bool ISConsoleInputY(bool default_val)
-    {
-        String? line = Console.ReadLine();
-        if (line != null && (line == "Y" || line == "y"))
-        {
-            return true;
-        }
-        else if (line == "")
-        {
-            return default_val;
-        }
-        return false;
-    }
-}
 
+}

@@ -2,7 +2,7 @@
   "profiles": {
     "papt": {
       "commandName": "Project",
-      "commandLineArgs": "update"
+      "commandLineArgs": "install build-essential -y"
     }
   }
 }
