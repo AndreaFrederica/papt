@@ -1,8 +1,10 @@
-name: .NET Build for Windows and Linux
+name: .NET Build and Release
 
 on:
   push:
     branches: ["master"]
+    tags:
+      - "v*"  # 新增标签触发条件
   pull_request:
     branches: ["master"]
 
@@ -11,9 +13,9 @@ jobs:
     strategy:
       matrix:
         os: ["windows-latest", "ubuntu-latest"]
-
+    
     runs-on: ${{ matrix.os }}
-
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -22,28 +24,46 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Execute build script on Windows
-        if: runner.os == 'Windows'
+      - name: Execute build script
         run: |
-          pwsh -Command "./build.ps1"
+          # 统一脚本执行方式
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            pwsh -Command "./build.ps1"
+          else
+            pwsh -Command "./build.ps1"
+          fi
 
-      - name: Execute build script on Linux
-        if: runner.os == 'Linux'
-        run: |
-          pwsh -Command "./build.ps1"
-
-      - name: Upload Windows build artifacts
-        if: runner.os == 'Windows' && success()
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: windows-build-artifacts
+          name: ${{ runner.os }}-artifacts
           path: |
-            ./papt/bin/Release/net8.0/win-x64/publish/papt.exe
+            ${{ runner.os == 'Windows' && './papt/bin/Release/net8.0/win-x64/publish/papt.exe' || './papt/bin/Release/net8.0/linux-x64/publish/papt' }}
 
-      - name: Upload Linux build artifacts
-        if: runner.os == 'Linux' && success()
-        uses: actions/upload-artifact@v3
+  release:
+    needs: build
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 需要写入Release的权限
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
         with:
-          name: linux-build-artifacts
-          path: |
-            ./papt/bin/Release/net8.0/linux-x64/publish/papt
+          path: ./artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            Cross-platform build artifacts
+            - Windows: papt.exe
+            - Linux: papt
+          files: |
+            ./artifacts/Windows-artifacts/papt.exe
+            ./artifacts/Ubuntu-artifacts/papt
+          draft: false
+          prerelease: false

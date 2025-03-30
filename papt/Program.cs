@@ -139,16 +139,9 @@ public class PackageManagerScript
                 }
 
                 havePackage = true;
-                //if (commandArgs.Contains("build-essential"))
-                //{
-                //    Logger.Warning("Can you want install base-devel? [Y/n]");
-                //    if (confirmFlag != "" || ISConsoleInputY(true))
-                //    {
-                //        commandArgs.Remove("build-essential");
-                //        commandArgs.Add("base-devel");
-                //    }
-                //}
                 commandArgs = PackageTranslate.TranslatePackage(commandArgs, confirmFlag != "");
+                //? 对包名进行转译 替换Deb系的包名到Aur包名
+                // "build-essential" -->"base-devel"
                 packageString = string.Join(" ", commandArgs);
                 Logger.Info($"Packages = {packageString}");
                 break;
