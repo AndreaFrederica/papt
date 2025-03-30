@@ -1,10 +1,10 @@
-name: .NET Build and Release
+name: .NET Build with Flexible Release
 
 on:
   push:
     branches: ["master"]
     tags:
-      - "v*"  # 新增标签触发条件
+      - "v*"
   pull_request:
     branches: ["master"]
 
@@ -26,7 +26,6 @@ jobs:
 
       - name: Execute build script
         run: |
-          # 统一脚本执行方式
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             pwsh -Command "./build.ps1"
           else
@@ -34,7 +33,7 @@ jobs:
           fi
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-artifacts
           path: |
@@ -42,14 +41,14 @@ jobs:
 
   release:
     needs: build
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 需要写入Release的权限
+      contents: write
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
           path: ./artifacts
 
@@ -59,11 +58,12 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            Cross-platform build artifacts
+            Build Type: ${{ github.event_name }}
+            Artifacts:
             - Windows: papt.exe
             - Linux: papt
           files: |
-            ./artifacts/Windows-artifacts/papt.exe
-            ./artifacts/Ubuntu-artifacts/papt
+            ./artifacts/Windows-latest-artifacts/papt.exe
+            ./artifacts/Ubuntu-latest-artifacts/papt
           draft: false
           prerelease: false
