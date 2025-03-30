@@ -1,7 +1,6 @@
 # 定义公共参数
 $configuration = "Release"
 $selfContained = $true
-$publishSingleFile = $true
 $publishAot = $true
 
 # 设置运行时标识符
@@ -21,7 +20,6 @@ dotnet publish -c $configuration `
     -r $runtime `
     -o $outputDir `
     --self-contained $selfContained `
-    -p:PublishSingleFile=$publishSingleFile `
     -p:PublishAot=$publishAot `
     -p:DebugType=None `
     -p:DebugSymbols=false
