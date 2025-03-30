@@ -33,7 +33,7 @@ jobs:
         with:
           name: ${{ runner.os }}-artifacts
           path: |
-            ${{ runner.os == 'Windows' && './papt/bin/Release/net8.0/win-x64/publish/papt.exe' || './papt/bin/Release/net8.0/linux-x64/publish/papt' }}
+            ./bin/Release/${{ runner.os == 'Windows' && 'win-x64' || 'linux-x64' }}/publish/*
 
   release:
     needs: build
